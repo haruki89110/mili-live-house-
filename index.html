@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiLi の Live House</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- 更新字體為 Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Varela+Round&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            /* Cute diagonal stripes mimicking the frame from the reference image */
+            background-image: repeating-linear-gradient(
+                -45deg,
+                #FDB833,
+                #FDB833 30px,
+                #FFF0C7 30px,
+                #FFF0C7 60px
+            );
+            font-family: 'Noto Sans TC', sans-serif;
+            color: #5D4037;
+        }
+        
+        h1, h2, h3, .title-font {
+            font-family: 'Varela Round', 'Noto Sans TC', sans-serif;
+        }
+
+        @keyframes scrollUp {
+            0%, 20% { transform: translateY(0); }
+            25%, 45% { transform: translateY(-32px); }
+            50%, 70% { transform: translateY(-64px); }
+            75%, 95% { transform: translateY(-96px); }
+            100% { transform: translateY(-128px); }
+        }
+        .marquee-vertical {
+            animation: scrollUp 12s ease-in-out infinite;
+        }
+
+        /* --- 新增：自訂滑鼠游標 (Custom Cursor) --- */
+        @media (pointer: fine) {
+            body, a, button, input, textarea, select {
+                cursor: none;
+            }
+        }
+        .cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 12px; height: 12px;
+            background-color: #FDB833;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            pointer-events: none;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        .cursor-ring {
+            position: fixed;
+            top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 2px solid rgba(253, 184, 51, 0.6);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9998;
+            pointer-events: none;
+            transition: width 0.2s, height 0.2s, background-color 0.2s, transform 0.1s ease-out;
+        }
+        .cursor-hover .cursor-dot { width: 0; height: 0; }
+        .cursor-hover .cursor-ring {
+            width: 50px; height: 50px;
+            background-color: rgba(253, 184, 51, 0.2);
+            border-color: #FDB833;
+        }
+
+        /* --- 新增：背景漂浮物 (Floating Emojis) --- */
+        .floating-emoji {
+            position: fixed;
+            font-size: 2.5rem;
+            z-index: 0;
+            user-select: none;
+            cursor: none; /* 配合自訂游標 */
+            animation: floatUpDown 6s ease-in-out infinite;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .floating-emoji.spin {
+            transform: rotate(360deg) scale(1.2);
+        }
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* --- 新增：滑動揭示動畫 (Scroll Reveal) --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- 新增：表單果凍彈跳效果 (Bounce Focus) --- */
+        .focus-bounce:focus {
+            animation: bounceIn 0.4s ease-out forwards;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- 新增：按鈕呼吸燈效果 (Pulse Breathe) --- */
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 6px -1px rgba(253, 184, 51, 0.4);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 25px 8px rgba(253, 184, 51, 0.6);
+            }
+        }
+        .pulse-breathe {
+            animation: breathe 2.5s infinite ease-in-out;
+            /* 為了讓縮放變形不要糊掉，確保有 transition */
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+        .pulse-breathe:hover {
+            animation-play-state: paused;
+            transform: scale(1.08);
+            box-shadow: 0 0 25px 8px rgba(253, 184, 51, 0.6);
+        }
+
+        /* --- 新增：CD 旋轉頭像特效 (CD Spin Avatar) --- */
+        @keyframes spin-cd {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .cd-spin {
+            animation: spin-cd 20s linear infinite;
+        }
+        .cd-spin:hover {
+            animation-play-state: paused;
+        }
+        .cd-hole::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16%;
+            height: 16%;
+            background-color: #FFF9ED; /* 符合背景底色，營造透明感 */
+            border-radius: 50%;
+            border: 2px solid #FDB833;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .cd-gloss {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.4) 15%,
+                rgba(255, 255, 255, 0) 30%,
+                rgba(255, 255, 255, 0) 50%,
+                rgba(255, 255, 255, 0.4) 65%,
+                rgba(255, 255, 255, 0) 80%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        /* --- 新增：可愛自訂捲軸 (Custom Scrollbar) --- */
+        ::-webkit-scrollbar {
+            width: 14px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff9ed;
+            border-left: 2px dashed #ffdda1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #FDB833;
+            border-radius: 10px;
+            border: 3px solid #fff9ed; /* 讓拉條看起來像膠囊 */
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #ff9d00;
+        }
+    </style>
+</head>
+<body class="p-0 md:p-6 lg:p-12 min-h-screen flex justify-center items-start relative">
+
+    <!-- 專屬游標元素 -->
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-ring hidden md:block"></div>
+
+    <!-- 背景互動漂浮物 (點擊會旋轉) -->
+    <div class="floating-emoji hidden lg:block" style="top: 15%; left: 5%;">✨</div>
+    <div class="floating-emoji hidden lg:block" style="top: 60%; left: 8%; animation-delay: 1s;">🍰</div>
+    <div class="floating-emoji hidden lg:block" style="top: 25%; right: 5%; animation-delay: 2s;">🎵</div>
+    <div class="floating-emoji hidden lg:block" style="top: 70%; right: 8%; animation-delay: 0.5s;">🍮</div>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-4xl bg-[#FFF9ED] shadow-2xl md:rounded-3xl overflow-hidden border-0 md:border-4 border-white/60 relative z-10">
+        
+        <!-- Header / Navigation -->
+        <header class="pt-10 pb-6 px-8 border-b-2 border-[#FDB833]/30 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#D84339] tracking-wider mb-6 title-font drop-shadow-sm">MiLi の Live House</h1>
+            <h2 class="text-xl font-bold text-[#FF8800] mb-6">新人VTuber MiLi 參上~★</h2>
+            <nav class="flex justify-center space-x-6 md:space-x-12 text-lg font-bold text-[#8D6E63]">
+                <a href="#home" class="hover:text-[#D84339] transition-colors pb-1 border-b-2 border-transparent hover:border-[#D84339]">首頁</a>
+                <a href="#about" class="hover:text-[#D84339] transition-colors pb-1 border-b-2 border-transparent hover:border-[#D84339]">關於MiLi</a>
+                <a href="#works" class="hover:text-[#D84339] transition-colors pb-1 border-b-2 border-transparent hover:border-[#D84339]">作品</a>
+                <a href="#contact" class="hover:text-[#D84339] transition-colors pb-1 border-b-2 border-transparent hover:border-[#D84339]">聯絡</a>
+            </nav>
+        </header>
+
+        <!-- 新增：跑馬燈 (垂直往上通知區塊) -->
+        <div class="bg-[#FFF0C7] border-b-2 border-[#FDB833]/30 px-6 md:px-12 py-2 flex items-center">
+            <span class="text-[#D84339] font-bold mr-3 whitespace-nowrap">📢 甜點嶼廣播：</span>
+            <div class="h-[32px] overflow-hidden relative w-full">
+                <!-- 游標移入時暫停動畫 (hover:[animation-play-state:paused]) -->
+                <div class="marquee-vertical flex flex-col hover:[animation-play-state:paused] cursor-default">
+                    <div class="h-[32px] flex items-center text-[#8D6E63] font-bold text-sm md:text-base"><span class="mr-2">🎉</span>【活動預告】初配信 Live 即將登場，敬請期待！</div>
+                    <div class="h-[32px] flex items-center text-[#8D6E63] font-bold text-sm md:text-base"><span class="mr-2">🛍️</span>【週邊通販】官方原創角色徽章、壓克力立牌熱賣中</div>
+                    <div class="h-[32px] flex items-center text-[#8D6E63] font-bold text-sm md:text-base"><span class="mr-2">🎵</span>【新曲推播】最新翻唱作品《戀愛裁判》已上傳 YouTube</div>
+                    <div class="h-[32px] flex items-center text-[#8D6E63] font-bold text-sm md:text-base"><span class="mr-2">🤝</span>【VT聯動】週末即將與神秘嘉賓進行遊戲直播！</div>
+                    <!-- 複製第一筆以達到無縫輪播 -->
+                    <div class="h-[32px] flex items-center text-[#8D6E63] font-bold text-sm md:text-base"><span class="mr-2">🎉</span>【活動預告】初配信 Live 即將登場，敬請期待！</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <section id="home" class="flex flex-col-reverse md:flex-row items-center justify-between p-8 md:p-12 border-b-2 border-[#FDB833]/30 gap-8">
+            <div class="flex-1 text-center md:text-left">
+                <h2 class="text-3xl font-bold mb-4 text-[#D84339] title-font">歡迎光臨這座甜點嶼 🍰</h2>
+                <p class="text-lg md:text-xl mb-8 leading-relaxed font-medium">
+                    <br>用設計記錄生活♫ <br>
+                    <br>讓我們在這裡融化所有疲憊 <br>
+                    <br>找回生活的甜度吧~ <br>
+                    <br><br>
+                    <span class="text-sm text-[#8D6E63]">讓平凡的日常，變得不平凡！✨</span>
+                </p>
+                <a href="#works" class="pulse-breathe cursor-hover-target inline-block bg-[#FDB833] text-[#5D4037] px-8 py-3 rounded-full font-bold text-lg hover:bg-[#FCA311]">
+                    看看我的作品 →
+                </a>
+            </div>
+            <div class="flex-1 flex justify-center md:justify-end relative">
+                <!-- Decorative background blob behind image -->
+                <div class="absolute inset-0 bg-[#FFF0C7] rounded-full blur-xl scale-90 -z-10"></div>
+                <!-- 新增：CD 旋轉風格頭像 -->
+                <div class="relative w-56 h-56 md:w-72 md:h-72 rounded-full border-4 border-white shadow-xl flex-shrink-0 mx-auto md:mx-0 overflow-hidden cd-spin cd-hole cursor-hover-target">
+                    <!-- 強制指定圖片檔名 -->
+                    <img src="https://cdn.phototourl.com/member/2026-11-03-205c4145-73d9-45de-a704-c3a9bd03860c.png" alt="MiLi Character" class="w-full h-full object-cover">
+                    <!-- CD 光澤塗層 -->
+                    <div class="cd-gloss"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="reveal flex flex-col md:flex-row items-center p-8 md:p-12 border-b-2 border-[#FDB833]/30 gap-8 bg-[#FFFDF8]">
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-3 h-8 bg-[#FDB833] rounded-full"></div>
+                    <h2 class="text-2xl font-bold title-font">自我介紹</h2>
+                </div>
+                <p class="text-lg leading-relaxed mb-4">
+                    你好！我是 <span class="font-bold text-[#D84339]">MiLi</span>，一名熱愛設計與音樂的學生。<br>
+                    喜歡觀察生活、發掘靈感，並透過設計傳達想法。
+                </p>
+                <p class="text-lg leading-relaxed">
+                    平常除了畫畫，也喜歡在 Live House 唱歌與大家互動，希望能把溫暖的力量帶給每一個觀眾！
+                </p>
+            </div>
+            <div class="flex-1 w-full">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border-2 border-[#FFF0C7] hover:border-[#FDB833] transition-colors duration-300 cursor-hover-target">
+                    <img src="https://img.remit.ee/i/1Spxg9eKGqi2" alt="Life Style" onerror="this.src='https://placehold.co/400x300/FDB833/FFF?text=Life+Style'" class="rounded-xl w-full object-cover mb-4">
+                    <ul class="space-y-3 font-medium text-[#8D6E63]">
+                        <li class="flex items-center gap-2"><span>🎨</span> 專長：角色設計、UI/UX</li>
+                        <li class="flex items-center gap-2"><span>🎤</span> 興趣：駐唱、翻唱、看動漫</li>
+                        <li class="flex items-center gap-2"><span>☕</span> 喜歡：焦糖瑪奇朵、貓咪</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Works Section -->
+        <section id="works" class="reveal p-8 md:p-12 border-b-2 border-[#FDB833]/30 min-h-[500px]">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-3 h-8 bg-[#FDB833] rounded-full"></div>
+                <h2 class="text-2xl font-bold title-font">精選作品</h2>
+            </div>
+
+            <!-- 新增：固定置頂的初配信影片區塊 -->
+            <div class="mb-10 bg-white p-4 md:p-6 rounded-3xl shadow-sm border-4 border-[#FDB833] relative overflow-hidden cursor-hover-target">
+                <!-- 裝飾小標籤 -->
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 bg-[#FDB833] text-white px-6 py-1 rounded-b-xl font-bold text-sm md:text-base shadow-sm z-10 whitespace-nowrap">
+                    ✨ MiLiの初配信 ✨
+                </div>
+                
+                <!-- 響應式影片容器 -->
+                <div class="relative w-full aspect-video rounded-xl overflow-hidden mt-6 bg-[#FEF8ED] shadow-inner">
+                    <iframe 
+                        class="absolute top-0 left-0 w-full h-full"
+                        src="https://www.image2url.com/r2/default/videos/1793672139281-43321258-c512-499a-b8c8-eeb91e938de2.mp4" 
+                        title="初配信" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- Breadcrumb 導覽列 (預設隱藏) -->
+            <div id="portfolio-header" class="mb-6 flex justify-between items-center hidden bg-white p-3 rounded-xl shadow-sm border-2 border-[#FFF0C7]">
+                <div class="text-[#D84339] font-bold text-lg md:text-xl breadcrumb">
+                    📂 全部作品 〉 <span id="current-folder-name" class="text-[#8D6E63]"></span>
+                </div>
+                <button class="back-btn cursor-hover-target bg-[#FDB833] text-white px-4 py-2 rounded-lg font-bold hover:bg-[#FCA311] transition-all flex items-center gap-2 shadow-sm">
+                    ⬅️ 返回
+                </button>
+            </div>
+
+            <!-- 第一層：資料夾視圖 (Folder View) -->
+            <div id="folder-view" class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-10">
+                <!-- Folder: 直播 -->
+                <div class="folder cursor-hover-target group" data-target="live" data-name="Live直播">
+                    <div class="w-1/2 h-4 md:h-6 bg-[#FDB833] rounded-t-xl ml-2 group-hover:bg-[#FCA311] transition-colors border-t-2 border-l-2 border-r-2 border-[#FCA311]"></div>
+                    <div class="bg-[#FDB833] rounded-2xl rounded-tl-none p-4 md:p-6 shadow-md group-hover:-translate-y-1 group-hover:shadow-lg transition-all border-2 border-[#FCA311]">
+                        <div class="text-3xl md:text-4xl mb-2">🎙️</div>
+                        <h3 class="font-bold text-white text-lg md:text-xl">Live直播</h3>
+                    </div>
+                </div>
+                <!-- Folder: 實況 -->
+                <div class="folder cursor-hover-target group" data-target="stream" data-name="遊戲實況">
+                    <div class="w-1/2 h-4 md:h-6 bg-[#FF9A8B] rounded-t-xl ml-2 group-hover:bg-[#E68A7D] transition-colors border-t-2 border-l-2 border-r-2 border-[#E68A7D]"></div>
+                    <div class="bg-[#FF9A8B] rounded-2xl rounded-tl-none p-4 md:p-6 shadow-md group-hover:-translate-y-1 group-hover:shadow-lg transition-all border-2 border-[#E68A7D]">
+                        <div class="text-3xl md:text-4xl mb-2">🎮</div>
+                        <h3 class="font-bold text-white text-lg md:text-xl">遊戲實況</h3>
+                    </div>
+                </div>
+                <!-- Folder: 插畫/設計 -->
+                <div class="folder cursor-hover-target group" data-target="design" data-name="插畫作品">
+                    <div class="w-1/2 h-4 md:h-6 bg-[#82D0CB] rounded-t-xl ml-2 group-hover:bg-[#75BDB8] transition-colors border-t-2 border-l-2 border-r-2 border-[#75BDB8]"></div>
+                    <div class="bg-[#82D0CB] rounded-2xl rounded-tl-none p-4 md:p-6 shadow-md group-hover:-translate-y-1 group-hover:shadow-lg transition-all border-2 border-[#75BDB8]">
+                        <div class="text-3xl md:text-4xl mb-2">🎨</div>
+                        <h3 class="font-bold text-white text-lg md:text-xl">插畫作品</h3>
+                    </div>
+                </div>
+                <!-- Folder: 動畫作品 -->
+                <div class="folder cursor-hover-target group" data-target="animation" data-name="動畫作品">
+                    <div class="w-1/2 h-4 md:h-6 bg-[#9CB4EA] rounded-t-xl ml-2 group-hover:bg-[#8CA2D3] transition-colors border-t-2 border-l-2 border-r-2 border-[#8CA2D3]"></div>
+                    <div class="bg-[#9CB4EA] rounded-2xl rounded-tl-none p-4 md:p-6 shadow-md group-hover:-translate-y-1 group-hover:shadow-lg transition-all border-2 border-[#8CA2D3]">
+                        <div class="text-3xl md:text-4xl mb-2">🎬</div>
+                        <h3 class="font-bold text-white text-lg md:text-xl">動畫作品</h3>
+                    </div>
+                </div>
+                <!-- Folder: 原創歌曲 -->
+                <div class="folder cursor-hover-target group" data-target="original" data-name="原創歌曲">
+                    <div class="w-1/2 h-4 md:h-6 bg-[#D7A9E3] rounded-t-xl ml-2 group-hover:bg-[#C198CC] transition-colors border-t-2 border-l-2 border-r-2 border-[#C198CC]"></div>
+                    <div class="bg-[#D7A9E3] rounded-2xl rounded-tl-none p-4 md:p-6 shadow-md group-hover:-translate-y-1 group-hover:shadow-lg transition-all border-2 border-[#C198CC]">
+                        <div class="text-3xl md:text-4xl mb-2">🎵</div>
+                        <h3 class="font-bold text-white text-lg md:text-xl">原創歌曲</h3>
+                    </div>
+                </div>
+                <!-- Folder: 翻唱COVER -->
+                <div class="folder cursor-hover-target group" data-target="cover" data-name="翻唱COVER">
+                    <div class="w-1/2 h-4 md:h-6 bg-[#A8E6CF] rounded-t-xl ml-2 group-hover:bg-[#97CFAA] transition-colors border-t-2 border-l-2 border-r-2 border-[#97CFAA]"></div>
+                    <div class="bg-[#A8E6CF] rounded-2xl rounded-tl-none p-4 md:p-6 shadow-md group-hover:-translate-y-1 group-hover:shadow-lg transition-all border-2 border-[#97CFAA]">
+                        <div class="text-3xl md:text-4xl mb-2">🎤</div>
+                        <h3 class="font-bold text-white text-lg md:text-xl">翻唱COVER</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第二層：內容視圖 (Items View, 預設隱藏) -->
+            <div id="items-view" class="hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="portfolio-grid">
+                    
+                    <!-- 直播 1 (Video Modal) -->
+                    <a href="javascript:void(0)" onclick="openItemModal('video', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="work-item cursor-hover-target bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all border-2 border-[#FFF0C7] hover:border-[#FDB833] group block relative" data-category="live">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="https://placehold.co/400x300/FDB833/FFF?text=Live+Stream" alt="Live Work" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-[#FDB833]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-bold text-lg drop-shadow-md">▶️ 觀看重播</span>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h3 class="font-bold text-lg mb-1 group-hover:text-[#D84339] transition-colors">週末棉花糖雜談</h3>
+                            <p class="text-sm text-[#8D6E63]">2026.12.26 直播存檔</p>
+                        </div>
+                    </a>
+
+                    <!-- 實況 1 (Video Modal) -->
+                    <a href="javascript:void(0)" onclick="openItemModal('video', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="work-item cursor-hover-target bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all border-2 border-[#FFF0C7] hover:border-[#FDB833] group block relative" data-category="stream">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="https://placehold.co/400x300/FDB833/FFF?text=Game+Stream" alt="Stream Work" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-[#FDB833]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-bold text-lg drop-shadow-md">▶️ 觀看精華</span>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h3 class="font-bold text-lg mb-1 group-hover:text-[#D84339] transition-colors">APEX 冠軍之戰！</h3>
+                            <p class="text-sm text-[#8D6E63]">遊戲實況精華剪輯</p>
+                        </div>
+                    </a>
+
+                    <!-- 插畫/設計 1 (Image Modal) -->
+                    <a href="javascript:void(0)" onclick="openItemModal('image', 'https://placehold.co/800x600/81B29A/FFF?text=Visual+Design+Details')" class="work-item cursor-hover-target bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all border-2 border-[#FFF0C7] hover:border-[#FDB833] group block relative" data-category="design">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="https://placehold.co/400x300/81B29A/FFF?text=Visual+Design" alt="Work 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-[#FDB833]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-bold text-lg drop-shadow-md">🔍 觀看大圖</span>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h3 class="font-bold text-lg mb-1 group-hover:text-[#D84339] transition-colors">主視覺設計</h3>
+                            <p class="text-sm text-[#8D6E63]">2023 Live 演唱會</p>
+                        </div>
+                    </a>
+
+                    <!-- 翻唱COVER 1 (Video Modal) -->
+                    <a href="javascript:void(0)" onclick="openItemModal('video', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="work-item cursor-hover-target bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all border-2 border-[#FFF0C7] hover:border-[#3D5A80] group block relative" data-category="cover">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="https://placehold.co/400x300/3D5A80/FFF?text=Cover+Song" alt="Work 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-[#3D5A80]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-bold text-lg drop-shadow-md">▶️ 觀看 MV</span>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h3 class="font-bold text-lg mb-1 group-hover:text-[#3D5A80] transition-colors">戀愛裁判 (Cover)</h3>
+                            <p class="text-sm text-[#8D6E63]">翻唱與剪輯</p>
+                        </div>
+                    </a>
+
+                    <!-- 插畫/設計 2 (Image Modal) -->
+                    <a href="javascript:void(0)" onclick="openItemModal('image', 'https://placehold.co/800x600/F2CC8F/5D4037?text=Merch+Details')" class="work-item cursor-hover-target bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all border-2 border-[#FFF0C7] hover:border-[#FDB833] group block relative" data-category="design">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="https://placehold.co/400x300/F2CC8F/5D4037?text=Merch" alt="Work 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-[#81B29A]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-bold text-lg drop-shadow-md">🔍 周邊細節</span>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h3 class="font-bold text-lg mb-1 group-hover:text-[#D84339] transition-colors">原創周邊商品</h3>
+                            <p class="text-sm text-[#8D6E63]">徽章、壓克力立牌</p>
+                        </div>
+                    </a>
+                    
+                    <!-- 動畫作品 1 (Video Modal) -->
+                    <a href="javascript:void(0)" onclick="openItemModal('video', 'https://www.youtube.com/embed/dQw4w9WgXcQ')" class="work-item cursor-hover-target bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all border-2 border-[#FFF0C7] hover:border-[#9D4EDD] group block relative" data-category="animation">
+                        <div class="h-40 overflow-hidden relative">
+                            <img src="https://placehold.co/400x300/9D4EDD/FFF?text=Animation+Works" alt="Animation Work" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-[#9D4EDD]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <span class="text-white font-bold text-lg drop-shadow-md">▶️ 播放動畫</span>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h3 class="font-bold text-lg mb-1 group-hover:text-[#9D4EDD] transition-colors">原創動畫短片</h3>
+                            <p class="text-sm text-[#8D6E63]">角色動態與特效展示</p>
+                        </div>
+                    </a>
+
+                    <!-- 原創歌曲 1 (Inline Audio, No Modal) -->
+                    <div class="work-item bg-white rounded-2xl overflow-hidden shadow-sm transition-all border-2 border-[#FFF0C7] hover:border-[#E07A5F] group block relative" data-category="original">
+                        <div class="h-40 overflow-hidden relative cursor-hover-target">
+                            <img src="https://placehold.co/400x300/E07A5F/FFF?text=Original+Song" alt="Original Work" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute top-2 right-2 bg-white/90 p-2 rounded-full shadow-sm text-[#E07A5F]">🎵</div>
+                        </div>
+                        <div class="p-4 text-center flex flex-col items-center">
+                            <h3 class="font-bold text-lg mb-2 group-hover:text-[#E07A5F] transition-colors">甜點嶼的微風 (Demo)</h3>
+                            <!-- 內建控制播放器 -->
+                            <audio controls class="w-full h-10 outline-none rounded-full cursor-hover-target" controlsList="nodownload">
+                                <!-- 放入您的音樂音檔 src -->
+                                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                                您的瀏覽器不支援 audio 標籤。
+                            </audio>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Latest News Section -->
+        <section id="news" class="reveal p-8 md:p-12 border-b-2 border-[#FDB833]/30 bg-[#FFFDF8]">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-3 h-8 bg-[#FDB833] rounded-full"></div>
+                <h2 class="text-2xl font-bold title-font">最新消息</h2>
+            </div>
+            
+            <div class="flex flex-col space-y-4">
+                <!-- News Item 1 -->
+                <a href="#" class="flex items-center justify-between bg-white p-5 rounded-2xl shadow-sm border-2 border-[#FFF0C7] hover:border-[#FDB833] hover:bg-[#FFF8E7] transition-all group">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-[#FFD166] rounded-xl flex items-center justify-center text-2xl shadow-inner">
+                            🎤
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg group-hover:text-[#D84339] transition-colors">初配信 Live 演唱會正式決定！</h4>
+                            <span class="text-sm text-[#8D6E63]">2024.05.10</span>
+                        </div>
+                    </div>
+                    <svg class="w-6 h-6 text-[#FDB833] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+                
+                <!-- News Item 2 -->
+                <a href="#" class="flex items-center justify-between bg-white p-5 rounded-2xl shadow-sm border-2 border-[#FFF0C7] hover:border-[#FDB833] hover:bg-[#FFF8E7] transition-all group">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-[#81B29A] rounded-xl flex items-center justify-center text-2xl shadow-inner">
+                            🖼️
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg group-hover:text-[#D84339] transition-colors">全新插畫系列「夏日祭典」公開</h4>
+                            <span class="text-sm text-[#8D6E63]">2024.04.22</span>
+                        </div>
+                    </div>
+                    <svg class="w-6 h-6 text-[#FDB833] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+
+                <!-- News Item 3 -->
+                <a href="#" class="flex items-center justify-between bg-white p-5 rounded-2xl shadow-sm border-2 border-[#FFF0C7] hover:border-[#FDB833] hover:bg-[#FFF8E7] transition-all group">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-[#E07A5F] rounded-xl flex items-center justify-center text-2xl shadow-inner">
+                            📢
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg group-hover:text-[#D84339] transition-colors">官方周邊商店開幕預告</h4>
+                            <span class="text-sm text-[#8D6E63]">2024.03.15</span>
+                        </div>
+                    </div>
+                    <svg class="w-6 h-6 text-[#FDB833] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="reveal flex flex-col md:flex-row p-8 md:p-12 gap-8 lg:gap-12 relative overflow-hidden">
+            <!-- Decorative dots -->
+            <div class="absolute bottom-4 left-4 text-[#FDB833] opacity-20 text-4xl hidden md:block">••••<br>••••<br>••••</div>
+            
+            <div class="flex-1 relative z-10">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-3 h-8 bg-[#FDB833] rounded-full"></div>
+                    <h2 class="text-2xl font-bold title-font">聯絡方式</h2>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-2 border-[#FFF0C7]">
+                    <p class="text-lg mb-4 font-bold text-[#D84339]">
+                        ✉️ 歡迎與我聯絡！
+                    </p>
+                    <p class="text-md leading-relaxed mb-6 text-[#8D6E63]">
+                        一起聊聊設計、音樂，<br>或是討論各種有趣的合作可能！
+                    </p>
+                    <div class="flex flex-col gap-2">
+                        <a href="mailto:hello@mililivehouse.com" class="flex items-center gap-2 hover:text-[#D84339] transition-colors font-medium">
+                            <span>📧</span> hello@mililivehouse.com
+                        </a>
+                        <div class="flex items-center gap-2 text-[#8D6E63] font-medium mt-2">
+                            <span>🍭</span> Sweet Island 
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 relative z-10">
+                <form class="flex flex-col space-y-4 bg-[#FFFDF8] p-6 rounded-2xl shadow-sm border-2 border-[#FFF0C7]">
+                    <div>
+                        <label class="block text-sm font-bold text-[#8D6E63] mb-1 ml-1">姓名 Name</label>
+                        <!-- 加入 focus-bounce 和 ring 效果 -->
+                        <input type="text" placeholder="請輸入您的姓名" class="w-full bg-white p-3 rounded-xl border-2 border-[#FFF0C7] focus:outline-none focus:border-[#FDB833] focus:ring-4 focus:ring-[#FDB833]/20 focus-bounce transition-all cursor-hover-target">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8D6E63] mb-1 ml-1">電子郵件 Email</label>
+                        <!-- 加入 focus-bounce 和 ring 效果 -->
+                        <input type="email" placeholder="example@email.com" class="w-full bg-white p-3 rounded-xl border-2 border-[#FFF0C7] focus:outline-none focus:border-[#FDB833] focus:ring-4 focus:ring-[#FDB833]/20 focus-bounce transition-all cursor-hover-target">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8D6E63] mb-1 ml-1">留言內容 Message</label>
+                        <!-- 加入 focus-bounce 和 ring 效果 -->
+                        <textarea placeholder="請簡述您的需求或想說的話..." rows="4" class="w-full bg-white p-3 rounded-xl border-2 border-[#FFF0C7] focus:outline-none focus:border-[#FDB833] focus:ring-4 focus:ring-[#FDB833]/20 focus-bounce transition-all resize-none cursor-hover-target"></textarea>
+                    </div>
+                    <!-- 按鈕加入 active:scale-95 按壓狀態 -->
+                    <button type="button" class="cursor-hover-target bg-[#5D4037] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#8D6E63] active:scale-95 transition-all self-end mt-2 shadow-md hover:shadow-lg flex items-center gap-2">
+                        <span>送出訊息</span> <span>✉️</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+        <!-- 新增：影片/圖片共用 Modal (彈出視窗) -->
+        <div id="videoModal" class="fixed inset-0 z-[99999] hidden bg-black/80 flex items-center justify-center p-4 md:p-12 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+            <div class="bg-[#FFF9ED] p-2 md:p-4 rounded-3xl w-full max-w-4xl relative border-4 border-[#FDB833] transform scale-95 transition-transform duration-300 shadow-2xl flex flex-col justify-center" id="videoModalContent">
+                <!-- 關閉按鈕 -->
+                <button onclick="closeVideoModal()" class="absolute -top-4 -right-4 md:-top-6 md:-right-6 bg-[#D84339] text-white w-10 h-10 md:w-12 md:h-12 rounded-full font-bold text-xl flex items-center justify-center shadow-lg hover:bg-[#C0392B] hover:scale-110 transition-all cursor-hover-target z-10 border-2 border-white">
+                    ✕
+                </button>
+                <!-- 媒體容器 (動態切換 iframe 或 img) -->
+                <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-inner flex items-center justify-center">
+                    <iframe id="modalIframe" class="absolute top-0 left-0 w-full h-full hidden" src="" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <img id="modalImg" class="max-w-full max-h-full object-contain hidden" src="" alt="Enlarged Work">
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-[#5D4037] text-[#FFF0C7] text-center py-6">
+            <p class="text-sm font-medium">© 2026 MiLi Live House. All Rights Reserved.</p>
+        </footer>
+
+    </main>
+
+    <!-- 腳本區域 (包含所有互動邏輯) -->
+    <script>
+        // 1. 自訂游標邏輯 (Custom Cursor)
+        const dot = document.querySelector('.cursor-dot');
+        const ring = document.querySelector('.cursor-ring');
+        
+        // 判斷是否為觸控設備，若非觸控才啟用滑鼠追蹤
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', (e) => {
+                // 讓圓點直接跟隨
+                dot.style.left = e.clientX + 'px';
+                dot.style.top = e.clientY + 'px';
+                
+                // 讓外圈稍微延遲跟隨 (利用 CSS transition 完成)
+                ring.style.left = e.clientX + 'px';
+                ring.style.top = e.clientY + 'px';
+            });
+
+            // 遇到可點擊元素時放大游標
+            const hoverTargets = document.querySelectorAll('a, button, input, textarea, .cursor-hover-target');
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+        }
+
+        // 2. 漂浮物點擊旋轉 (Floating Emojis)
+        const emojis = document.querySelectorAll('.floating-emoji');
+        emojis.forEach(emoji => {
+            // 加入 hover 改變游標樣式
+            emoji.classList.add('cursor-hover-target');
+            emoji.addEventListener('click', function() {
+                // 加入旋轉 class，並在動畫結束後移除，以便下次可再次點擊
+                this.classList.add('spin');
+                setTimeout(() => {
+                    this.classList.remove('spin');
+                }, 600); 
+            });
+        });
+
+        // 3. 滑動揭示動畫 (Scroll Reveal)
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.15 });
+        
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // 4. 資料夾視圖與過濾邏輯 (Folder & Items Logic)
+        const folderView = document.getElementById('folder-view');
+        const itemsView = document.getElementById('items-view');
+        const portfolioHeader = document.getElementById('portfolio-header');
+        const currentFolderName = document.getElementById('current-folder-name');
+        const backBtn = document.querySelector('.back-btn');
+        const folders = document.querySelectorAll('.folder');
+        const workItems = document.querySelectorAll('.work-item');
+
+        // 資料夾點擊進入第二層
+        folders.forEach(folder => {
+            folder.addEventListener('click', () => {
+                const target = folder.getAttribute('data-target');
+                const name = folder.getAttribute('data-name');
+                
+                // 更新導覽麵包屑文字
+                currentFolderName.textContent = name;
+                
+                // 隱藏第一層資料夾，顯示第二層項目與導覽列
+                folderView.classList.add('hidden');
+                portfolioHeader.classList.remove('hidden');
+                itemsView.classList.remove('hidden');
+                
+                // 過濾並加上顯示動畫
+                workItems.forEach(item => {
+                    if (item.getAttribute('data-category') === target) {
+                        item.style.display = 'block';
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateY(15px)';
+                        setTimeout(() => {
+                            item.style.transition = 'all 0.4s ease';
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
+                        }, 50);
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 點擊返回上一層
+        if(backBtn) {
+            backBtn.addEventListener('click', () => {
+                itemsView.classList.add('hidden');
+                portfolioHeader.classList.add('hidden');
+                folderView.classList.remove('hidden');
+            });
+        }
+
+        // 5. 影片/圖片共用 Modal 控制邏輯
+        const videoModal = document.getElementById('videoModal');
+        const videoModalContent = document.getElementById('videoModalContent');
+        const modalIframe = document.getElementById('modalIframe');
+        const modalImg = document.getElementById('modalImg');
+
+        function openItemModal(type, url) {
+            // 先隱藏所有媒體元素
+            modalIframe.classList.add('hidden');
+            modalImg.classList.add('hidden');
+
+            if (type === 'video') {
+                modalIframe.src = url; 
+                modalIframe.classList.remove('hidden');
+            } else if (type === 'image') {
+                modalImg.src = url;
+                modalImg.classList.remove('hidden');
+            }
+            
+            videoModal.classList.remove('hidden');
+            
+            // 觸發淡入動畫
+            setTimeout(() => {
+                videoModal.classList.remove('opacity-0');
+                videoModal.classList.add('opacity-100');
+                videoModalContent.classList.remove('scale-95');
+                videoModalContent.classList.add('scale-100');
+            }, 10);
+            
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeVideoModal() {
+            videoModal.classList.remove('opacity-100');
+            videoModal.classList.add('opacity-0');
+            videoModalContent.classList.remove('scale-100');
+            videoModalContent.classList.add('scale-95');
+            
+            // 動畫結束後清空src並隱藏
+            setTimeout(() => {
+                videoModal.classList.add('hidden');
+                modalIframe.src = ''; 
+                modalImg.src = '';
+                document.body.style.overflow = ''; 
+            }, 300);
+        }
+
+        videoModal.addEventListener('click', function(e) {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+    </script>
+</body>
+</html>
